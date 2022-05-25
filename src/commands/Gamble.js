@@ -1,9 +1,6 @@
 const Casino = require("../schemas/CasinoSchema");
 
 const Gamble = async (interaction) => {
-  if (interaction.member.id === client.user.id) {
-    return;
-  }
   const foundPlayer = await Casino.findOne({
     discordId: interaction.member.id,
   });

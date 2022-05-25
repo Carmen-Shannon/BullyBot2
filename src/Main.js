@@ -1,4 +1,4 @@
-const { Client, Intents } = require("discord.js");
+const { Client, Intents, MessageCollector } = require("discord.js");
 const { token } = require("../private/token.json");
 const mongoose = require("mongoose");
 const Join = require("./commands/Join");
@@ -7,6 +7,7 @@ const Play = require("./commands/Play");
 const Stop = require("./commands/Stop");
 const Gamble = require("./commands/Gamble");
 const Motivate = require("./commands/Motivate");
+const Blackjack = require("./commands/Blackjack");
 
 const client = new Client({
   intents: [
@@ -51,28 +52,16 @@ client.on("interactionCreate", async (interaction) => {
     await Stop(interaction);
   }
   if (interaction.commandName === "gamble") {
+    if (interaction.member.id === client.user.id) {
+      return;
+    }
     await Gamble(interaction);
   }
   if (interaction.commandName === "motivate") {
     await Motivate(interaction);
   }
   if (interaction.commandName === "blackjack") {
-    const cards = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
-    const suites = ["Hearts", "Diamonds", "Clubs", "Spades"];
-    const deck = [];
-    const playerCards = [];
-    const dealerCards = [];
-    for (let c of cards) {
-      for (let s of suites) {
-        deck.push([c, s]);
-      }
-    }
-    let isGambling = true;
-
-    client.once("messageCreate", async (message) => {
-      await message.reply("Success! - " + message.content);
-      isGambling = false;
-    });
+    await Blackjack(interaction, client);
   }
 });
 
