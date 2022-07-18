@@ -1,10 +1,12 @@
 const DeckGenerator = require("../services/DeckGenerator");
 const Casino = require("../schemas/CasinoSchema");
 const Shuffle = require("../services/Shuffle");
-const AceCheck = require("../services/Acecheck");
+const AceCheck = require("../services/AceCheck");
 const SumCards = require("../services/SumCards");
 const PullCard = require("../services/PullCard");
 const { MessageCollector } = require("discord.js");
+const AddRep = require("../services/AddRep");
+const RemRep = require("../services/RemRep");
 
 const Blackjack = async (interaction, client) => {
   let player = await Casino.findOne({ discordId: interaction.member.id });
@@ -44,6 +46,9 @@ const Blackjack = async (interaction, client) => {
     if (isNaN(parseInt(message.content)) && betting) {
       return await message.reply("You must enter a number");
     }
+    if (parseInt(message.content) < 0 && betting) {
+      return await message.reply("You can not bet a negative number");
+    }
     if (parseInt(message.content) > player.money && betting) {
       return await message.reply(
         "You can not bet more than what you currently have"
@@ -75,6 +80,7 @@ const Blackjack = async (interaction, client) => {
             money: player.money + bet * 6,
           }
         );
+        await AddRep(interaction, bet, 3, player);
         playing = false;
         collector.stop("Game over");
       }
@@ -95,11 +101,12 @@ const Blackjack = async (interaction, client) => {
               money: player.money - bet,
             }
           );
+          await RemRep(interaction, bet, 3, player);
           playing = false;
           collector.stop("Game over");
           return;
         }
-        if (SumCards(playercards) === 21) {
+        if (SumCards(playercardsint) === 21) {
           await message.reply(
             `You pulled ${
               playercards[playercards.length - 1]
@@ -115,6 +122,7 @@ const Blackjack = async (interaction, client) => {
               money: player.money + bet * 6,
             }
           );
+          await AddRep(interaction, bet, 3, player);
           playing = false;
           collector.stop("Game over");
           return;
@@ -157,6 +165,7 @@ const Blackjack = async (interaction, client) => {
               money: player.money - bet,
             }
           );
+          await RemRep(interaction, bet, 3, player);
           playing = false;
           staying = false;
           collector.stop("Game over");
@@ -173,6 +182,7 @@ const Blackjack = async (interaction, client) => {
               money: player.money + bet * 2,
             }
           );
+          await AddRep(interaction, bet, 3, player);
           playing = false;
           staying = false;
           collector.stop("Game over");
@@ -189,6 +199,7 @@ const Blackjack = async (interaction, client) => {
               money: player.money - bet,
             }
           );
+          await RemRep(interaction, bet, 3, player);
           playing = false;
           staying = false;
           collector.stop("Game over");
@@ -218,6 +229,7 @@ const Blackjack = async (interaction, client) => {
               money: player.money + bet * 6,
             }
           );
+          await AddRep(interaction, bet, 3, player);
           playing = false;
           collector.stop("Game over");
         }

@@ -37,6 +37,14 @@ const commands = [
   new SlashCommandBuilder()
     .setName("blackjack")
     .setDescription("Play Blackjack 21 with a live deck of cards"),
+
+  new SlashCommandBuilder()
+    .setName("refill")
+    .setDescription("Refill your wallet, only works if you have $0"),
+
+  new SlashCommandBuilder()
+    .setName("number")
+    .setDescription("Play the number game! Select a bet and difficulty"),
 ].map((command) => command.toJSON());
 
 const rest = new REST({ version: "9" }).setToken(token);

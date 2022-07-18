@@ -8,6 +8,8 @@ const Stop = require("./commands/Stop");
 const Gamble = require("./commands/Gamble");
 const Motivate = require("./commands/Motivate");
 const Blackjack = require("./commands/Blackjack");
+const Refill = require("./commands/Refill");
+const NumberGame = require("./commands/NumberGame");
 
 const client = new Client({
   intents: [
@@ -62,6 +64,12 @@ client.on("interactionCreate", async (interaction) => {
   }
   if (interaction.commandName === "blackjack") {
     await Blackjack(interaction, client);
+  }
+  if (interaction.commandName === "refill") {
+    await Refill(interaction);
+  }
+  if (interaction.commandName === "number") {
+    await NumberGame(interaction, client);
   }
 });
 
