@@ -1,4 +1,4 @@
-const { Client, Intents, MessageCollector } = require("discord.js");
+const { Client, GatewayIntentBits } = require("discord.js");
 const { token } = require("../private/token.json");
 const mongoose = require("mongoose");
 const Join = require("./commands/Join");
@@ -10,14 +10,14 @@ const Motivate = require("./commands/Motivate");
 const Blackjack = require("./commands/Blackjack");
 const Refill = require("./commands/Refill");
 const NumberGame = require("./commands/NumberGame");
-
+const Skip = require("./commands/Skip");
+const Intents = GatewayIntentBits;
 const client = new Client({
-  intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_VOICE_STATES,
-  ],
+  intents: [Intents.Guilds, Intents.GuildMessages, Intents.GuildVoiceStates],
 });
+
+var queue = [];
+var currentAudioSub;
 
 client.once("ready", () => {
   mongoose
@@ -48,10 +48,13 @@ client.on("interactionCreate", async (interaction) => {
     await Leave(interaction);
   }
   if (interaction.commandName === "play") {
-    await Play(interaction);
+    currentAudioSub = await Play(interaction, queue, currentAudioSub);
+  }
+  if (interaction.commandName === "skip") {
+    currentAudioSub = await Skip(interaction, queue, currentAudioSub);
   }
   if (interaction.commandName === "stop") {
-    await Stop(interaction);
+    await Stop(interaction, currentAudioSub, queue);
   }
   if (interaction.commandName === "gamble") {
     if (interaction.member.id === client.user.id) {

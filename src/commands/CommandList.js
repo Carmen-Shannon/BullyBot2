@@ -14,6 +14,9 @@ const commands = [
         .setRequired(true)
     ),
   new SlashCommandBuilder()
+    .setName("skip")
+    .setDescription("Skips the current audio if there is one"),
+  new SlashCommandBuilder()
     .setName("join")
     .setDescription("Connects bot to current voice channel"),
   new SlashCommandBuilder()

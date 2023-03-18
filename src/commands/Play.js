@@ -1,42 +1,45 @@
-const {
-  joinVoiceChannel,
-  createAudioPlayer,
-  createAudioResource,
-} = require("@discordjs/voice");
-const ytSearch = require("yt-search");
-const play = require("play-dl");
+const { joinVoiceChannel, getVoiceConnection } = require("@discordjs/voice");
+const playVideo = require("../services/PlayVideo.js");
+const videoFinder = require("../services/VideoFinder.js");
 
-const Play = async (interaction) => {
+const Play = async (interaction, queue, currentAudioSub) => {
   const voiceChannel = interaction.member.voice.channel;
 
   if (!voiceChannel) {
     return await interaction.reply("You must be in a voice channel to do that");
   }
-  const connection = joinVoiceChannel({
-    channelId: voiceChannel.id,
-    guildId: voiceChannel.guild.id,
-    adapterCreator: voiceChannel.guild.voiceAdapterCreator,
-    selfDeaf: false,
-  });
 
-  const videoFinder = async (query) => {
-    const result = await ytSearch(query);
-    return result.videos.length > 1 ? result.videos[0] : null;
-  };
+  var connection = getVoiceConnection(voiceChannel.guild.id);
+
+  if (!connection) {
+    connection = joinVoiceChannel({
+      channelId: voiceChannel.id,
+      guildId: voiceChannel.guild.id,
+      adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+      selfDeaf: false,
+    });
+  }
 
   const video = await videoFinder(interaction.options.getString("search"));
+  await queue.push(video);
 
-  if (video) {
-    const stream = await play.stream(video.url);
-    const audioStream = createAudioResource(stream.stream, {
-      inputType: stream.type,
-    });
-    const player = createAudioPlayer();
-    connection.subscribe(player);
-    player.play(audioStream);
-    return await interaction.reply(`Playing ${video.title}`);
+  if (queue.length === 1) {
+    await interaction.reply(`Playing ${queue[0].title}`);
+    currentAudioSub = await playVideo(
+      (queue[0].duration.seconds + 1) * 1000,
+      connection,
+      queue,
+      interaction,
+    );
+  } else {
+    await interaction.reply(
+      `Adding video to queue - ${video.title}\nPosition after current song - ${
+        queue.length - 1
+      }`
+    );
   }
-  return await interaction.reply("Error fetching video");
+
+  return currentAudioSub;
 };
 
 module.exports = Play;

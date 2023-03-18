@@ -1,6 +1,6 @@
 const { joinVoiceChannel } = require("@discordjs/voice");
 
-const Stop = async (interaction) => {
+const Stop = async (interaction, currentAudioSub, queue) => {
   const voiceChannel = interaction.member.voice.channel;
 
   if (!voiceChannel) {
@@ -13,6 +13,10 @@ const Stop = async (interaction) => {
     selfDeaf: false,
   });
   connection.receiver.voiceConnection.destroy();
+  currentAudioSub[0].player.stop();
+  currentAudioSub[0].player.unsubscribe();
+  clearTimeout(currentAudioSub[1]);
+  queue = [];
 
   return await interaction.reply("Goodbye!");
 };
