@@ -1,2 +1,4 @@
 private/
 node_modules/
+CommandList.js
+DeleteCommands.js
