@@ -13,7 +13,12 @@ const NumberGame = require("./commands/NumberGame");
 const Skip = require("./commands/Skip");
 const Intents = GatewayIntentBits;
 const client = new Client({
-  intents: [Intents.Guilds, Intents.GuildMessages, Intents.GuildVoiceStates],
+  intents: [
+    Intents.Guilds,
+    Intents.GuildMessages,
+    Intents.GuildVoiceStates,
+    Intents.MessageContent,
+  ],
 });
 
 var queue = [];
