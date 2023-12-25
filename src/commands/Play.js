@@ -9,7 +9,7 @@ const Play = async (interaction, queue, currentAudioSub) => {
     return await interaction.reply("You must be in a voice channel to do that");
   }
 
-  var connection = getVoiceConnection(voiceChannel.guild.id);
+  let connection = getVoiceConnection(voiceChannel.guild.id);
 
   if (!connection) {
     connection = joinVoiceChannel({
@@ -29,7 +29,7 @@ const Play = async (interaction, queue, currentAudioSub) => {
       (queue[0].duration.seconds + 1) * 1000,
       connection,
       queue,
-      interaction,
+      interaction
     );
   } else {
     await interaction.reply(

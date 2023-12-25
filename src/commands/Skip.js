@@ -8,7 +8,7 @@ const Skip = async (interaction, queue, currentAudioSub) => {
     return await interaction.reply("You must be in a voice channel to do that");
   }
 
-  var connection = getVoiceConnection(voiceChannel.guild.id);
+  let connection = getVoiceConnection(voiceChannel.guild.id);
 
   if (!connection || queue.length === 0 || !currentAudioSub) {
     return await interaction.reply("No current audio to skip");
@@ -16,7 +16,7 @@ const Skip = async (interaction, queue, currentAudioSub) => {
 
   if (queue.length === 1) {
     await skip(queue, currentAudioSub, interaction);
-    await connection.receiver.voiceConnection.destroy();
+    connection.receiver.voiceConnection.destroy();
     return currentAudioSub;
   }
 
